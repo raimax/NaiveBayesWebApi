@@ -5,13 +5,17 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import LogisticRegression
+
+from Algorithm import Algorithm
 
 
 class Classifier:
-    def __init__(self):
+    def __init__(self, algorithm):
         self.accuracy = 0
         self.model = None
         self.vectorizer = None
+        self.algorithm = algorithm
 
     def initialize(self):
         data = pd.read_csv('https://raw.githubusercontent.com/AiDevNepal/ai-saturdays-workshop-8/master/data/spam.csv')
@@ -22,7 +26,12 @@ class Classifier:
         self.vectorizer = CountVectorizer(ngram_range=(1, 2)).fit(X_train)
         X_train_vectorized = self.vectorizer.transform(X_train)
         X_train_vectorized.toarray().shape
-        self.model = MultinomialNB(alpha=0.1)
+
+        if self.algorithm == Algorithm.NaiveBayes:
+            self.model = MultinomialNB(alpha=0.1)
+        else:
+            self.model = LogisticRegression(solver='liblinear', penalty='l1')
+
         self.model.fit(X_train_vectorized, Y_train)
         predictions = self.model.predict(self.vectorizer.transform(X_test))
 
